@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "294099814750",
+    "firebase_url": "https://uwlaamart.firebaseio.com",
+    "project_id": "uwlaamart",
+    "storage_bucket": "uwlaamart.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:294099814750:android:1c889364b7c3a47955a7cf",
+        "android_client_info": {
+          "package_name": "com.uwlaa.uwlaa"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "294099814750-p3g8qglkg5rjvep9u9omvhhro8b4qijr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.uwlaa.uwlaa",
+            "certificate_hash": "b8dbc2e5ee475e6d5e7e9c7919844e53bde91df1"
+          }
+        },
+        {
+          "client_id": "294099814750-jfi45hpu4sqgu5rob2ieb3q4envd2tm5.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCoePYyVim99ONQ_iHw0uMK3XuVySgq7_E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "294099814750-n3e2a57cc5mdima8tv97hu1b51muvtva.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
