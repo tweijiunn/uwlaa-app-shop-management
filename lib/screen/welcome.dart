@@ -5,6 +5,7 @@ import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_facebook_login/flutter_facebook_login.dart';
 import 'package:flutter_screenutil/screenutil.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uwlaa/model/country_code.dart';
@@ -649,6 +650,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    FlutterStatusbarcolor.setStatusBarColor(Theme.of(context).primaryColor);
+
     YYDialog.init(context);
 
     var dialog = yyProgressDialogNoBody();
@@ -1369,9 +1372,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         child: Text(
                           "Sign In",
                           style: TextStyle(
-                              fontSize: ScreenUtil().setSp(50.0),
-                              fontWeight: FontWeight.w800,
-                              color: Colors.white),
+                            fontSize: ScreenUtil().setSp(50.0),
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
