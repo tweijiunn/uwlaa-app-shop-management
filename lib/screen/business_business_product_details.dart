@@ -39,6 +39,7 @@ class BusinessBusinessProductDetail extends StatefulWidget {
   final int daysToShip;
   final String productType;
   final String halalCertImage;
+  final String halalIssueCountry;
   final int numberOfProduct;
   final int totalStock;
   final String shopOwnerId;
@@ -68,6 +69,7 @@ class BusinessBusinessProductDetail extends StatefulWidget {
     @required this.daysToShip,
     @required this.productType,
     @required this.halalCertImage,
+    @required this.halalIssueCountry,
     @required this.numberOfProduct,
     @required this.totalStock,
     @required this.shopOwnerId,
@@ -1493,9 +1495,8 @@ class _BusinessBusinessProductDetailState
           return true;
         }
       }
-    } else {
-      return true;
     }
+    return true;
   }
 
   Future<void> _addToCart(YYDialog dialog) async {
@@ -1605,9 +1606,15 @@ class _BusinessBusinessProductDetailState
     _tabController.dispose();
   }
 
+  _getRequests() async {
+    print("I am here");
+  }
+
   @override
   Widget build(BuildContext context) {
     FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);
+
+    GlobalKey _scaffoldKey = GlobalKey();
 
     YYDialog yyProgressDialogNoBody() {
       return YYDialog().build()
@@ -1629,6 +1636,7 @@ class _BusinessBusinessProductDetailState
 
     double _top = 120;
     return Scaffold(
+      key: _scaffoldKey,
       resizeToAvoidBottomInset: true,
       backgroundColor: Color(0xFFF5F5F5),
       body: NestedScrollView(
@@ -1651,10 +1659,12 @@ class _BusinessBusinessProductDetailState
                     ),
                   ),
                   onPressed: () {
-                    Navigator.push(
-                      context,
+                    Navigator.pushReplacement(
+                      _scaffoldKey.currentContext,
                       MaterialPageRoute(
-                        builder: (context) => BusinessCart(),
+                        builder: (context) => BusinessCart(
+                          from: 'product',
+                        ),
                       ),
                     );
                   },
@@ -2063,8 +2073,12 @@ class _BusinessBusinessProductDetailState
                                       child: RaisedButton(
                                         color: Theme.of(context).primaryColor,
                                         onPressed: () {
-                                          var dialog = yyProgressDialogNoBody();
-                                          _addToCart(dialog);
+                                          Future.delayed(Duration.zero)
+                                              .then((value) {
+                                            var dialog =
+                                                yyProgressDialogNoBody();
+                                            _addToCart(dialog);
+                                          });
                                         },
                                         child: Text(
                                           "Confirm",
@@ -2670,8 +2684,12 @@ class _BusinessBusinessProductDetailState
                                       child: RaisedButton(
                                         color: Theme.of(context).primaryColor,
                                         onPressed: () {
-                                          var dialog = yyProgressDialogNoBody();
-                                          _addToCart(dialog);
+                                          Future.delayed(Duration.zero)
+                                              .then((value) {
+                                            var dialog =
+                                                yyProgressDialogNoBody();
+                                            _addToCart(dialog);
+                                          });
                                         },
                                         child: Text(
                                           "Confirm",

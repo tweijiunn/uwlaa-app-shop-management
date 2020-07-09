@@ -32,9 +32,11 @@ class BusinessProduct {
   final List<WholesaleDetail> wholesaleDetails; // min, max, price
   final List<Variations>
       variations; // variation_name_1, variation_name_2, stock, price, image_url, quantity, tag
+  final List<ShippingOptions> shippingOptions;
   final int daysToShip; // Only needed when isPreOrder is needed
   final String productType; // Muslim friendly or halal certified
   final String halalCertImage;
+  final String halalIssueCountry;
   final int numberOfProduct;
   final int totalStock;
   final String shopOwnerId;
@@ -61,9 +63,11 @@ class BusinessProduct {
     this.extraQuestionForm,
     this.wholesaleDetails,
     this.variations,
+    this.shippingOptions,
     this.daysToShip,
     this.productType,
     this.halalCertImage,
+    this.halalIssueCountry,
     this.numberOfProduct,
     this.totalStock,
     this.shopOwnerId,
@@ -92,14 +96,102 @@ class BusinessProduct {
       extraQuestionForm: json["extra_question_form"],
       wholesaleDetails: json["wholesale_details"],
       variations: json["variation_list"],
+      shippingOptions: json["shipping_options"],
       daysToShip: json["days_to_ship"],
       productType: json["product_type"],
       halalCertImage: json["halal_cert_image"],
+      halalIssueCountry: json["halal_certificate_issue_country"],
       numberOfProduct: json["shop_number_of_product"],
       totalStock: json["total_stock"],
       shopOwnerId: json["shop_owner_id"],
       // Shipping options
     );
+  }
+
+  @override
+  String toString() {
+    String response =
+        "{ isPreOrder: $isPreOrder, isVariationMode: $isVariationMode, isVariation2Enabled: $isVariation2Enabled, productName: $productName, minimumLot: $minimumLot, productRating: $productRating, productPrice: $productPrice, productId: $productId, isFavourite: $isFavourite, priceDisplay: $priceDisplay, shopName: $shopName, shopRating: $shopRating, unitSold: $unitSold, daysToShip: $daysToShip, productType: $productType, numberOfProduct: $numberOfProduct, totalStock: $totalStock, shopOwnerId: $shopOwnerId, ";
+    for (int i = 0; i < extraQuestionForm.length; i++) {
+      if (extraQuestionForm[i].answer != "") {
+        if (i == 0 && i == extraQuestionForm.length - 1) {
+          response += "extraQuestionForm: [ " +
+              extraQuestionForm[i].toString() +
+              " ], ";
+        } else if (i == 0) {
+          response +=
+              "extraQuestionForm: [ " + extraQuestionForm[i].toString() + ", ";
+        } else if (i == extraQuestionForm.length - 1) {
+          response += extraQuestionForm[i].toString() + " ], ";
+        } else {
+          response += extraQuestionForm[i].toString() + ", ";
+        }
+      }
+    }
+    for (int i = 0; i < wholesaleDetails.length; i++) {
+      if (i == 0 && i == wholesaleDetails.length - 1) {
+        response +=
+            "wholesaleDetails: [ " + wholesaleDetails[i].toString() + " ], ";
+      } else if (i == 0) {
+        response +=
+            "wholesaleDetails: [ " + wholesaleDetails[i].toString() + ", ";
+      } else if (i == wholesaleDetails.length - 1) {
+        response += wholesaleDetails[i].toString() + " ], ";
+      } else {
+        response += wholesaleDetails[i].toString() + ", ";
+      }
+    }
+    for (int i = 0; i < variations.length; i++) {
+      if (i == 0 && i == variations.length - 1) {
+        response += "variations: [ " + variations[i].toString() + " ], }";
+      } else if (i == 0) {
+        response += "variations: [ " + variations[i].toString() + ", ";
+      } else if (i == variations.length - 1) {
+        response += variations[i].toString() + " ], }";
+      } else {
+        response += variations[i].toString() + ", ";
+      }
+    }
+    return response;
+  }
+}
+
+class ShippingOptions {
+  final bool options;
+  final int shippingMultiplier;
+  final String id;
+  final String category;
+  var shippingFee;
+  final String title;
+  final bool isEnabled;
+
+  ShippingOptions({
+    this.options,
+    this.shippingMultiplier,
+    this.id,
+    this.category,
+    this.shippingFee,
+    this.title,
+    this.isEnabled,
+  });
+
+  factory ShippingOptions.fromJson(Map<String, dynamic> json) {
+    return new ShippingOptions(
+      options: json["options"],
+      shippingMultiplier: json["shipping_multiplier"],
+      id: json["id"],
+      category: json["category"],
+      shippingFee: json["shipping_fee"],
+      title: json["title"],
+      isEnabled: json["isEnabled"],
+    );
+  }
+
+  @override
+  String toString() {
+    String response =
+        "{ options: $options, shippingMultiplier: $shippingMultiplier, id: $id, category: $category, shippingFee: $shippingFee, title: $title, isEnabled: $isEnabled }";
+    return response;
   }
 }
 
@@ -144,7 +236,7 @@ class Variations {
   @override
   String toString() {
     String response =
-        "{variationId: $variationId, variationName1: $variationName1, variationName2: $variationName2, stock: $stock, price: $price, imageUrl: $imageUrl, quantity: $quantity, tag: $tag}";
+        "{variationId: $variationId, addedToCartQuantity: $addedToCartQuantity, variationName1: $variationName1, variationName2: $variationName2, stock: $stock, price: $price, imageUrl: $imageUrl, quantity: $quantity, tag: $tag}";
     return response;
   }
 }
