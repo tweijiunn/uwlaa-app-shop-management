@@ -1598,6 +1598,7 @@ class _BusinessBusinessProductDetailState
     _buildVariationImageList();
     _variationDefaultImage = widget.coverImage;
     _tabController = TabController(length: _numberOfVariation, vsync: this);
+    print(widget.halalCertImage);
   }
 
   @override
@@ -1743,6 +1744,41 @@ class _BusinessBusinessProductDetailState
                         ),
                       ),
                     ),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Container(
+                        width: 100.0,
+                        margin: EdgeInsets.only(
+                          top: 10.0,
+                        ),
+                        padding: EdgeInsets.only(
+                          left: 5.0,
+                          right: 5.0,
+                          top: 3.0,
+                          bottom: 3.0,
+                        ),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(15.0),
+                          color: widget.productType == "muslim_friendly"
+                              ? Color(0xFF43A047)
+                              : Color(0xFF01579B),
+                        ),
+                        child: Align(
+                          alignment: Alignment.center,
+                          child: Text(
+                            widget.productType == "muslim_friendly"
+                                ? "Muslim Friendly"
+                                : "Halal Certified",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: ScreenUtil().setSp(35.0),
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                     Visibility(
                       visible: widget.wholesaleDetails.length < 2,
                       child: Container(
@@ -1790,7 +1826,12 @@ class _BusinessBusinessProductDetailState
                                       direction: Axis.horizontal,
                                     )
                                   : Container(
-                                      child: Text("No review yet"),
+                                      child: Text(
+                                        "No review yet",
+                                        style: TextStyle(
+                                          fontSize: ScreenUtil().setSp(45.0),
+                                        ),
+                                      ),
                                     ),
                               Visibility(
                                 visible: widget.productRating >= 1,
@@ -2293,6 +2334,41 @@ class _BusinessBusinessProductDetailState
               ),
             ),
             SliverToBoxAdapter(
+              child: Visibility(
+                visible: widget.halalCertImage != null &&
+                    widget.halalCertImage != "",
+                child: Container(
+                  margin: EdgeInsets.only(top: 10.0),
+                  color: Colors.white,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Container(
+                        padding: EdgeInsets.all(15.0),
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            "Halal Certificate (${widget.halalIssueCountry})",
+                            style: TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: ScreenUtil().setSp(45.0),
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Divider(
+                        height: 1.0,
+                      ),
+                      Container(
+                        child: Image.network(widget.halalCertImage),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            SliverToBoxAdapter(
               child: Container(
                 margin: EdgeInsets.only(
                   top: 10.0,
@@ -2327,55 +2403,72 @@ class _BusinessBusinessProductDetailState
                                 margin: EdgeInsets.only(
                                   top: 5.0,
                                 ),
-                                child: Row(
-                                  children: <Widget>[
-                                    RatingBarIndicator(
-                                      rating: _userRating,
-                                      itemBuilder: (context, index) => Icon(
-                                        Icons.star,
-                                        color: Colors.amber,
-                                      ),
-                                      itemCount: 5,
-                                      itemSize: 18.0,
-                                      unratedColor: Colors.amber.withAlpha(50),
-                                      direction: Axis.horizontal,
-                                    ),
-                                    Container(
-                                      margin: EdgeInsets.only(left: 15.0),
-                                      child: Text(
-                                        _userRating.toString() + "/5",
-                                        style: TextStyle(
-                                          color: Theme.of(context).primaryColor,
-                                          fontSize: ScreenUtil().setSp(40.0),
-                                          fontWeight: FontWeight.w600,
+                                child: widget.productRating >= 1
+                                    ? Row(
+                                        children: <Widget>[
+                                          RatingBarIndicator(
+                                            rating: _userRating,
+                                            itemBuilder: (context, index) =>
+                                                Icon(
+                                              Icons.star,
+                                              color: Colors.amber,
+                                            ),
+                                            itemCount: 5,
+                                            itemSize: 18.0,
+                                            unratedColor:
+                                                Colors.amber.withAlpha(50),
+                                            direction: Axis.horizontal,
+                                          ),
+                                          Container(
+                                            margin: EdgeInsets.only(left: 15.0),
+                                            child: Text(
+                                              _userRating.toString() + "/5",
+                                              style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .primaryColor,
+                                                fontSize:
+                                                    ScreenUtil().setSp(40.0),
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ),
+                                          Container(
+                                            margin: EdgeInsets.only(left: 15.0),
+                                            child: Text(
+                                              "($_howManyReview Reviews)",
+                                              style: TextStyle(
+                                                color: Colors.grey,
+                                                fontSize:
+                                                    ScreenUtil().setSp(40.0),
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                    : Container(
+                                        child: Text(
+                                          "No review yet",
+                                          style: TextStyle(
+                                            fontSize: ScreenUtil().setSp(45.0),
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    Container(
-                                      margin: EdgeInsets.only(left: 15.0),
-                                      child: Text(
-                                        "($_howManyReview Reviews)",
-                                        style: TextStyle(
-                                          color: Colors.grey,
-                                          fontSize: ScreenUtil().setSp(40.0),
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
                               )
                             ],
                           ),
-                          Container(
-                            child: InkWell(
-                              onTap: () {},
-                              child: Text(
-                                "See All >",
-                                style: TextStyle(
-                                  color: Theme.of(context).primaryColor,
-                                  fontSize: ScreenUtil().setSp(45.0),
-                                  fontWeight: FontWeight.w600,
+                          Visibility(
+                            visible: widget.productRating >= 1,
+                            child: Container(
+                              child: InkWell(
+                                onTap: () {},
+                                child: Text(
+                                  "See All >",
+                                  style: TextStyle(
+                                    color: Theme.of(context).primaryColor,
+                                    fontSize: ScreenUtil().setSp(45.0),
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ),
                             ),
