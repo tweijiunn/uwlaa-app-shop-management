@@ -113,6 +113,7 @@ class _BusinessCheckOutState extends State<BusinessCheckOut> {
         "products": item["products"]
       });
     }
+    dialog.show();
     // TODO: Put actual shop id
     var url =
         "https://us-central1-uwlaamart.cloudfunctions.net/httpFunction/api/v1/createOrder";
@@ -130,6 +131,26 @@ class _BusinessCheckOutState extends State<BusinessCheckOut> {
         .then((response) {
       debugPrint(response.body.toString(), wrapWidth: 1024);
       // print(response.body.toString());
+      var resp = json.decode(response.body);
+      dialog.dismiss();
+      if (resp["status"] == "OK") {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (BuildContext context) => PaymentStatusScreen(
+              paymentStatus: "Success",
+            ),
+          ),
+        );
+      } else {
+        print(resp["status"]);
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (BuildContext context) => PaymentStatusScreen(
+              paymentStatus: "Error",
+            ),
+          ),
+        );
+      }
     }).catchError((onError) {
       print(onError.toString());
     });
@@ -232,7 +253,8 @@ class _BusinessCheckOutState extends State<BusinessCheckOut> {
 
     StripePayment.paymentRequestWithCardForm(CardFormPaymentRequest())
         .then((paymentMethod) {
-      double amount = _totalPayment * 100.0;
+      double amount = num.parse((_totalPayment * 100.0).toStringAsFixed(2));
+      print(amount.toString());
       INTENT.call(<String, dynamic>{'amount': amount, 'currency': 'myr'}).then(
           (response) {
         confirmDialog(response.data["client_secret"], paymentMethod);
