@@ -5,6 +5,7 @@ import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uwlaa/screen/business_business_home.dart';
+import 'package:uwlaa/screen/business_consumer_home.dart';
 import 'package:uwlaa/util/ui_icons.dart';
 
 class HomePage extends StatefulWidget {
@@ -232,10 +233,12 @@ class _HomePageState extends State<HomePage> {
                                   borderRadius: BorderRadius.circular(100),
                                   onTap: () {
                                     Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                BusinessBusinessHome()));
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            BusinessBusinessHome(),
+                                      ),
+                                    );
                                   },
                                   child: Container(
                                     height: 80.0,
@@ -271,7 +274,15 @@ class _HomePageState extends State<HomePage> {
                               Material(
                                 child: InkWell(
                                   borderRadius: BorderRadius.circular(100),
-                                  onTap: () {},
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            BusinessConsumerHome(),
+                                      ),
+                                    );
+                                  },
                                   child: Container(
                                     height: 80.0,
                                     width: 80.0,

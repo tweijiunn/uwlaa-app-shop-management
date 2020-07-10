@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:like_button/like_button.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uwlaa/model/business_product.dart';
 import 'package:uwlaa/model/http_request_response.dart';
 import 'package:uwlaa/model/slider.dart' as prefix0;
@@ -14,8 +15,9 @@ import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:uwlaa/screen/business_cart.dart';
 import 'package:http/http.dart' as http;
+import 'package:uwlaa/screen/consumer_cart.dart';
 
-class BusinessBusinessProductDetail extends StatefulWidget {
+class BusinessConsumerProductDetails extends StatefulWidget {
   final String productName;
   final String displayPrice;
   final String isPreOrder;
@@ -44,7 +46,7 @@ class BusinessBusinessProductDetail extends StatefulWidget {
   final int totalStock;
   final String shopOwnerId;
 
-  BusinessBusinessProductDetail({
+  BusinessConsumerProductDetails({
     Key key,
     @required this.productName,
     @required this.displayPrice,
@@ -76,18 +78,32 @@ class BusinessBusinessProductDetail extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _BusinessBusinessProductDetailState createState() =>
-      _BusinessBusinessProductDetailState();
+  _BusinessConsumerProductDetailsState createState() =>
+      _BusinessConsumerProductDetailsState();
 }
 
-class _BusinessBusinessProductDetailState
-    extends State<BusinessBusinessProductDetail>
+class _BusinessConsumerProductDetailsState
+    extends State<BusinessConsumerProductDetails>
     with SingleTickerProviderStateMixin {
   TabController _tabController;
 
   List<prefix0.Slider> _sliderList = [];
 
   List<Variations> _variationListV2 = List<Variations>();
+
+  String userId = "";
+  String fullName = "";
+  String signupType = "";
+  String email = "";
+
+  initPreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    userId = prefs.getString('user_id');
+    fullName = prefs.getString('name');
+    email = prefs.getString('email');
+    signupType = prefs.getString('signup_type');
+    setState(() {});
+  }
 
   void _initVariation() {
     for (var item in widget.variations) {
@@ -1506,7 +1522,7 @@ class _BusinessBusinessProductDetailState
       if (_isStockEnough()) {
         dialog.show();
         var url =
-            "https://us-central1-uwlaamart.cloudfunctions.net/httpFunction/api/v1/mobileAddToBusinessCart";
+            "https://us-central1-uwlaamart.cloudfunctions.net/httpFunction/api/v1/mobileAddToConsumerCart";
         if (!widget.isVariationMode) {
           variationIdList.add({
             'variation_id': widget.productId,
@@ -1531,9 +1547,8 @@ class _BusinessBusinessProductDetailState
             }
           }
         }
-        // TODO: The shop_id should get from shared preferences
         Map data = {
-          'user_shop_id': 'Utt59m46wLMb2lyyWhDG',
+          'user_id': userId,
           'selected_product_id': widget.productId,
           'variation_id_list': variationIdList,
           'selected_product_shop_id': widget.shopOwnerId
@@ -1593,6 +1608,8 @@ class _BusinessBusinessProductDetailState
   void initState() {
     super.initState();
     YYDialog.init(context);
+    print("halal " + widget.halalCertImage);
+    initPreferences();
     _initVariation();
     _addSlider();
     _buildVariationImageList();
@@ -1631,6 +1648,7 @@ class _BusinessBusinessProductDetailState
     }
 
     double _top = 120;
+
     return Scaffold(
       key: _scaffoldKey,
       resizeToAvoidBottomInset: true,
@@ -1658,7 +1676,7 @@ class _BusinessBusinessProductDetailState
                     Navigator.pushReplacement(
                       _scaffoldKey.currentContext,
                       MaterialPageRoute(
-                        builder: (context) => BusinessCart(
+                        builder: (context) => ConsumerCart(
                           from: 'product',
                         ),
                       ),
@@ -2330,9 +2348,9 @@ class _BusinessBusinessProductDetailState
             ),
             SliverToBoxAdapter(
               child: Visibility(
-                visible: widget.halalCertImage != null &&
+                visible: widget.halalCertImage != "null" &&
                     widget.halalCertImage != "" &&
-                    widget.halalCertImage != "null",
+                    widget.halalCertImage != null,
                 child: Container(
                   margin: EdgeInsets.only(top: 10.0),
                   color: Colors.white,
