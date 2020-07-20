@@ -1607,8 +1607,6 @@ class _BusinessConsumerProductDetailsState
   @override
   void initState() {
     super.initState();
-    YYDialog.init(context);
-    print("halal " + widget.halalCertImage);
     initPreferences();
     _initVariation();
     _addSlider();
@@ -1626,6 +1624,7 @@ class _BusinessConsumerProductDetailsState
   @override
   Widget build(BuildContext context) {
     FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);
+    YYDialog.init(context);
 
     GlobalKey _scaffoldKey = GlobalKey();
 
@@ -1760,7 +1759,7 @@ class _BusinessConsumerProductDetailsState
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Container(
-                        width: 100.0,
+                        width: 130.0,
                         margin: EdgeInsets.only(
                           top: 10.0,
                         ),

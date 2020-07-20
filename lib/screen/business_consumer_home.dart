@@ -334,7 +334,6 @@ class _BusinessConsumerHomeState extends State<BusinessConsumerHome> {
     super.initState();
 
     Future.delayed(Duration.zero).then((value) {
-      YYDialog.init(context);
       initPreferences();
     });
 
@@ -361,6 +360,7 @@ class _BusinessConsumerHomeState extends State<BusinessConsumerHome> {
   @override
   Widget build(BuildContext context) {
     FlutterStatusbarcolor.setStatusBarColor(Colors.white);
+    YYDialog.init(context);
 
     Widget businessHomeWidget = SafeArea(
       child: SmartRefresher(

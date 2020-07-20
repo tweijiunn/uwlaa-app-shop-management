@@ -6,12 +6,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uwlaa/model/business_product.dart';
 import 'package:uwlaa/model/slider.dart' as prefix0;
 import 'package:uwlaa/screen/business_business_product_details.dart';
 import 'package:uwlaa/util/ui_icons.dart';
-import 'dart:io';
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 import 'business_cart.dart';
 
@@ -27,6 +28,9 @@ class _BusinessBusinessHomeState extends State<BusinessBusinessHome> {
 
   List<prefix0.Slider> _sliderList = [];
   int _selectedBottomIndex = 0;
+
+  String shopId = "";
+  String shopLogo = "";
 
   YYDialog yyProgressDialogNoBody() {
     return YYDialog().build()
@@ -57,231 +61,135 @@ class _BusinessBusinessHomeState extends State<BusinessBusinessHome> {
     });
   }
 
-  BusinessProductList _businessProductList = BusinessProductList(
-    status: "",
-    businessProductList: [],
-  );
-
   List<BusinessProduct> _productList = List<BusinessProduct>();
 
   Future<void> _getAllProducts(YYDialog dialog) async {
+    var url =
+        "https://us-central1-uwlaamart.cloudfunctions.net/httpFunction/api/v1/mobileGetAllWholesaleProducts";
+    Map data = {"shop_id": shopId};
+    var body = json.encode(data);
     dialog.show();
-    var queryParameters = {"shop_id": "Utt59m46wLMb2lyyWhDG"};
-    HttpClient()
-        .postUrl(Uri.https(
-            'us-central1-uwlaamart.cloudfunctions.net',
-            '/httpFunction/api/v1/mobileGetAllWholesaleProducts',
-            queryParameters))
-        .then((HttpClientRequest request) => request.close())
-        .then((HttpClientResponse response) {
-      response
-          .transform(Utf8Decoder())
-          .transform(json.decoder)
-          .listen((contents) {
-        setState(() {
-          _businessProductList = BusinessProductList.fromJson(contents);
-          if (_businessProductList.status == 'OK') {
-            if (_businessProductList.businessProductList.length > 0) {
-              for (var item in _businessProductList.businessProductList) {
-                var isPreOrder,
-                    isVariationMode,
-                    isVariation2Enabled,
-                    productName,
-                    coverImage,
-                    productDescription,
-                    minimumLot,
-                    productRating,
-                    productPrice,
-                    productId,
-                    isFavourite,
-                    priceDisplay,
-                    shopName,
-                    shopRating,
-                    shopLogo,
-                    unitSold,
-                    productImages,
-                    extraQuestionForm,
-                    wholesaleDetails,
-                    variations,
-                    daysToShip,
-                    productType,
-                    halalCertImage,
-                    halalIssueCountry,
-                    numberOfProduct,
-                    totalStock,
-                    shopOwnerId;
-                List<ExtraQuestion> _extraQuestionList = List<ExtraQuestion>();
-                List<WholesaleDetail> _wholeSaleList = List<WholesaleDetail>();
-                List<Variations> _variationList = List<Variations>();
-                for (String key in item.keys) {
-                  if (key == "is_pre_order") {
-                    isPreOrder = item[key];
-                  } else if (key == "is_variation_mode") {
-                    isVariationMode = item[key];
-                  } else if (key == "is_variation2_enabled") {
-                    isVariation2Enabled = item[key];
-                  } else if (key == "product_name") {
-                    productName = item[key];
-                  } else if (key == "cover_image") {
-                    coverImage = item[key];
-                  } else if (key == "product_description") {
-                    productDescription = item[key];
-                  } else if (key == "minimum_lot") {
-                    minimumLot = item[key];
-                  } else if (key == "product_rating") {
-                    productRating = item[key];
-                  } else if (key == "product_price") {
-                    productPrice = item[key];
-                  } else if (key == "id") {
-                    productId = item[key];
-                  } else if (key == "is_favourite") {
-                    isFavourite = item[key];
-                  } else if (key == "price_display") {
-                    priceDisplay = item[key];
-                  } else if (key == "shop_name") {
-                    shopName = item[key];
-                  } else if (key == "shop_rating") {
-                    shopRating = item[key];
-                  } else if (key == "shop_logo") {
-                    shopLogo = item[key];
-                  } else if (key == "unit_sold") {
-                    unitSold = item[key];
-                  } else if (key == "product_images") {
-                    productImages = item[key];
-                  } else if (key == "extra_question_form") {
-                    extraQuestionForm = item[key];
-                    for (var i in extraQuestionForm) {
-                      var title, answer;
-                      for (String key1 in i.keys) {
-                        if (key1 == "title") {
-                          title = i[key1];
-                        } else if (key1 == "answer") {
-                          answer = i[key1];
-                        }
-                      }
-                      _extraQuestionList
-                          .add(ExtraQuestion(title: title, answer: answer));
-                    }
-                  } else if (key == "wholesale_details") {
-                    wholesaleDetails = item[key];
-                    for (var i in wholesaleDetails) {
-                      var min, max, price;
-                      for (String key1 in i.keys) {
-                        if (key1 == "min") {
-                          min = i[key1];
-                        } else if (key1 == "max") {
-                          max = i[key1];
-                        } else if (key1 == "price") {
-                          price = i[key1];
-                        }
-                      }
-                      _wholeSaleList.add(
-                          WholesaleDetail(min: min, max: max, price: price));
-                    }
-                  } else if (key == "variation_list") {
-                    variations = item[key];
-                    for (var i in variations) {
-                      var variationName1,
-                          variationName2,
-                          stock,
-                          price,
-                          imageUrl,
-                          quantity,
-                          tag,
-                          variationId,
-                          addedToCartQuantity;
-                      for (String key1 in i.keys) {
-                        if (key1 == "variation_name_1") {
-                          variationName1 = i[key1];
-                        } else if (key1 == "variation_name_2") {
-                          variationName2 = i[key1];
-                        } else if (key1 == "stock") {
-                          stock = i[key1];
-                        } else if (key1 == "price") {
-                          price = i[key1];
-                        } else if (key1 == "image_url") {
-                          imageUrl = i[key1];
-                        } else if (key1 == "quantity") {
-                          quantity = i[key1];
-                        } else if (key1 == "tag") {
-                          tag = i[key1];
-                        } else if (key1 == "variation_id") {
-                          variationId = i[key1];
-                        } else if (key1 == "added_to_cart_quantity") {
-                          addedToCartQuantity = i[key1];
-                        }
-                      }
-                      _variationList.add(
-                        Variations(
-                          variationName1: variationName1,
-                          variationName2: variationName2,
-                          stock: stock,
-                          price: price,
-                          imageUrl: imageUrl,
-                          quantity: quantity,
-                          tag: tag,
-                          variationId: variationId,
-                          addedToCartQuantity: addedToCartQuantity,
-                        ),
-                      );
-                    }
-                  } else if (key == "days_to_ship") {
-                    daysToShip = item[key];
-                  } else if (key == "product_type") {
-                    productType = item[key];
-                  } else if (key == "halal_cert_image") {
-                    halalCertImage = item[key];
-                  } else if (key == "halal_certificate_issue_country") {
-                    halalIssueCountry = item[key];
-                  } else if (key == "shop_number_of_product") {
-                    numberOfProduct = item[key];
-                  } else if (key == "total_stock") {
-                    totalStock = item[key];
-                  } else if (key == "shop_owner_id") {
-                    shopOwnerId = item[key];
-                  }
-                }
-                _productList.add(
-                  BusinessProduct(
-                    isPreOrder: isPreOrder,
-                    isVariationMode: isVariationMode,
-                    isVariation2Enabled: isVariation2Enabled,
-                    productName: productName,
-                    coverImage: coverImage,
-                    productDescription: productDescription,
-                    minimumLot: minimumLot,
-                    productRating: productRating,
-                    productPrice: productPrice,
-                    productId: productId,
-                    isFavourite: isFavourite,
-                    priceDisplay: priceDisplay,
-                    shopName: shopName,
-                    shopRating: shopRating,
-                    shopLogo: shopLogo,
-                    unitSold: unitSold,
-                    productImages: productImages,
-                    extraQuestionForm: _extraQuestionList,
-                    wholesaleDetails: _wholeSaleList,
-                    variations: _variationList,
-                    daysToShip: daysToShip,
-                    productType: productType,
-                    halalCertImage: halalCertImage,
-                    halalIssueCountry: halalIssueCountry,
-                    numberOfProduct: numberOfProduct,
-                    totalStock: totalStock,
-                    shopOwnerId: shopOwnerId,
-                  ),
-                );
-              }
-              dialog.dismiss();
-            } else {
-              dialog.dismiss();
-              // No product at the moment
+    http
+        .post(url, headers: {"Content-Type": "application/json"}, body: body)
+        .then((response) {
+      dialog.dismiss();
+      var resp = json.decode(response.body);
+      setState(() {
+        if (resp["status"] == "OK") {
+          for (var item in resp["result"]) {
+            List<ExtraQuestion> _extraQuestionList = List<ExtraQuestion>();
+            List<WholesaleDetail> _wholeSaleList = List<WholesaleDetail>();
+            List<Variations> _variationList = List<Variations>();
+            var isPreOrder = item["is_pre_order"];
+            var isVariationMode = item["is_variation_mode"];
+            var isVariation2Enabled = item["is_variation2_enabled"];
+            var productName = item["product_name"];
+            var coverImage = item["cover_image"];
+            var productDescription = item["product_description"];
+            var minimumLot = item["minimum_lot"];
+            var productRating = item["product_rating"];
+            var productPrice = item["product_price"];
+            var productId = item["id"];
+            var isFavourite = item["is_favourite"];
+            var priceDisplay = item["price_display"];
+            var shopName = item["shop_name"];
+            var shopRating = item["shop_rating"];
+            var shopLogo = item["shop_logo"];
+            var unitSold = item["unit_sold"];
+            var productImages = item["product_images"];
+            var extraQuestionForm = item["extra_question_form"];
+            for (var i in extraQuestionForm) {
+              var title, answer;
+              title = i["title"];
+              answer = i["answer"];
+              _extraQuestionList
+                  .add(ExtraQuestion(title: title, answer: answer));
             }
+            var wholesaleDetails = item["wholesale_details"];
+            for (var i in wholesaleDetails) {
+              var min = i["min"];
+              var max = i["max"];
+              var price = i["price"];
+              _wholeSaleList
+                  .add(WholesaleDetail(min: min, max: max, price: price));
+            }
+            var variations = item["variation_list"];
+            for (var i in variations) {
+              var variationName1 = i["variation_name_1"];
+              var variationName2 = i["variation_name_2"];
+              var stock = i["stock"];
+              var price = i["price"];
+              var imageUrl = i["image_url"];
+              var quantity = i["quantity"];
+              var tag = i["tag"];
+              var variationId = i["variation_id"];
+              var addedToCartQuantity = i["added_to_cart_quantity"];
+              _variationList.add(Variations(
+                variationName1: variationName1,
+                variationName2: variationName2,
+                stock: stock,
+                price: price,
+                imageUrl: imageUrl,
+                quantity: quantity,
+                tag: tag,
+                variationId: variationId,
+                addedToCartQuantity: addedToCartQuantity,
+              ));
+            }
+            var daysToShip = item["days_to_ship"];
+            var productType = item["product_type"];
+            var halalCertImage = item["halal_cert_image"];
+            var halalIssueCountry = item["halal_certificate_issue_country"];
+            var numberOfProduct = item["shop_number_of_product"];
+            var totalStock = item["total_stock"];
+            var shopOwnerId = item["shop_owner_id"];
+            _productList.add(BusinessProduct(
+              isPreOrder: isPreOrder,
+              isVariationMode: isVariationMode,
+              isVariation2Enabled: isVariation2Enabled,
+              productName: productName,
+              coverImage: coverImage,
+              productDescription: productDescription,
+              minimumLot: minimumLot,
+              productRating: productRating,
+              productPrice: productPrice,
+              productId: productId,
+              isFavourite: isFavourite,
+              priceDisplay: priceDisplay,
+              shopName: shopName,
+              shopRating: shopRating,
+              shopLogo: shopLogo,
+              unitSold: unitSold,
+              productImages: productImages,
+              extraQuestionForm: _extraQuestionList,
+              wholesaleDetails: _wholeSaleList,
+              variations: _variationList,
+              daysToShip: daysToShip,
+              productType: productType,
+              halalCertImage: halalCertImage,
+              halalIssueCountry: halalIssueCountry,
+              numberOfProduct: numberOfProduct,
+              totalStock: totalStock,
+              shopOwnerId: shopOwnerId,
+            ));
           }
-        });
+        } else {
+          print("error");
+        }
       });
+    }).catchError((onError) {
+      print(onError.toString());
     });
+  }
+
+  initPreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    shopId = prefs.getString('shop_id');
+    shopLogo = prefs.getString('shop_logo');
+    print("shopLogo " + shopLogo);
+    setState(() {});
+    var dialog = yyProgressDialogNoBody();
+    _getAllProducts(dialog);
   }
 
   Widget _buildCategory(String categoryName, IconData iconData) {
@@ -316,9 +224,7 @@ class _BusinessBusinessHomeState extends State<BusinessBusinessHome> {
   void initState() {
     super.initState();
     Future.delayed(Duration.zero).then((value) {
-      YYDialog.init(context);
-      var dialog = yyProgressDialogNoBody();
-      _getAllProducts(dialog);
+      initPreferences();
     });
 
     _sliderList.add(prefix0.Slider(
@@ -344,6 +250,7 @@ class _BusinessBusinessHomeState extends State<BusinessBusinessHome> {
   @override
   Widget build(BuildContext context) {
     FlutterStatusbarcolor.setStatusBarColor(Colors.white);
+    YYDialog.init(context);
 
     Widget businessHomeWidget = SafeArea(
       child: SmartRefresher(
@@ -409,13 +316,6 @@ class _BusinessBusinessHomeState extends State<BusinessBusinessHome> {
                   ],
                 ),
               ),
-              // sliver: SliverGrid.count(
-              //   crossAxisCount: 2,
-              //   crossAxisSpacing: 3.0,
-              //   mainAxisSpacing: 10.0,
-              //   childAspectRatio: 0.55,
-              //   children: _productListing,
-              // ),
               sliver: SliverGrid(
                 delegate: SliverChildBuilderDelegate(
                   (BuildContext context, int index) {
@@ -681,10 +581,11 @@ class _BusinessBusinessHomeState extends State<BusinessBusinessHome> {
           index: _selectedBottomIndex,
           children: <Widget>[
             businessHomeWidget,
-            businessHomeWidget,
-            // BusinessCart(
-            //   from: 'home',
-            // ),
+            Container(),
+            BusinessCart(
+              from: 'home',
+            ),
+            Container(),
           ],
         ),
         bottomNavigationBar: BottomNavigationBar(
@@ -711,13 +612,13 @@ class _BusinessBusinessHomeState extends State<BusinessBusinessHome> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
-            // BottomNavigationBarItem(
-            //   icon: Icon(UiIcons.shopping_cart),
-            //   title: Text(
-            //     "Cart",
-            //     style: TextStyle(fontWeight: FontWeight.bold),
-            //   ),
-            // ),
+            BottomNavigationBarItem(
+              icon: Icon(UiIcons.shopping_cart),
+              title: Text(
+                "Cart",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
             BottomNavigationBarItem(
               icon: Icon(UiIcons.user_3),
               title: Text(

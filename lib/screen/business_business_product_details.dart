@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:like_button/like_button.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uwlaa/model/business_product.dart';
 import 'package:uwlaa/model/http_request_response.dart';
 import 'package:uwlaa/model/slider.dart' as prefix0;
@@ -102,6 +103,12 @@ class _BusinessBusinessProductDetailState
   List<String> _variationImageList = [];
   int _totalAmountSelected = 0;
   double _totalAmountPrice = 0;
+  String shopId = "";
+
+  initPreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    shopId = prefs.getString('shop_id');
+  }
 
   Widget _buildVariationImage(String imageUrl, int option) {
     if (option == 1) {
@@ -1531,9 +1538,8 @@ class _BusinessBusinessProductDetailState
             }
           }
         }
-        // TODO: The shop_id should get from shared preferences
         Map data = {
-          'user_shop_id': 'Utt59m46wLMb2lyyWhDG',
+          'user_shop_id': shopId,
           'selected_product_id': widget.productId,
           'variation_id_list': variationIdList,
           'selected_product_shop_id': widget.shopOwnerId
@@ -1592,7 +1598,7 @@ class _BusinessBusinessProductDetailState
   @override
   void initState() {
     super.initState();
-    YYDialog.init(context);
+    initPreferences();
     _initVariation();
     _addSlider();
     _buildVariationImageList();
@@ -1609,6 +1615,7 @@ class _BusinessBusinessProductDetailState
   @override
   Widget build(BuildContext context) {
     FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);
+    YYDialog.init(context);
 
     GlobalKey _scaffoldKey = GlobalKey();
 
@@ -1742,7 +1749,7 @@ class _BusinessBusinessProductDetailState
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Container(
-                        width: 100.0,
+                        width: 130.0,
                         margin: EdgeInsets.only(
                           top: 10.0,
                         ),

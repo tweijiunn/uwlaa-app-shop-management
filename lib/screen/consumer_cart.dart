@@ -414,7 +414,6 @@ class _ConsumerCartState extends State<ConsumerCart> {
   Future<void> _updateCart(
     String variationId,
     String productId,
-    String userShopId,
     int amountToChange,
     int amountAfterChange,
     String type,
@@ -697,7 +696,6 @@ class _ConsumerCartState extends State<ConsumerCart> {
                                                             _updateCart(
                                                               j.variationId,
                                                               i.productId,
-                                                              "Utt59m46wLMb2lyyWhDG",
                                                               -i.productDetails
                                                                   .minimumLot,
                                                               j.addedToCartQuantity -
@@ -717,7 +715,6 @@ class _ConsumerCartState extends State<ConsumerCart> {
                                                 _updateCart(
                                                   j.variationId,
                                                   i.productId,
-                                                  "Utt59m46wLMb2lyyWhDG",
                                                   -i.productDetails.minimumLot,
                                                   j.addedToCartQuantity -
                                                       i.productDetails
@@ -792,7 +789,6 @@ class _ConsumerCartState extends State<ConsumerCart> {
                                                     _updateCart(
                                                       j.variationId,
                                                       i.productId,
-                                                      "Utt59m46wLMb2lyyWhDG",
                                                       i.productDetails
                                                           .minimumLot,
                                                       j.addedToCartQuantity +
@@ -1049,7 +1045,6 @@ class _ConsumerCartState extends State<ConsumerCart> {
   void initState() {
     super.initState();
     Future.delayed(Duration.zero).then((value) {
-      YYDialog.init(context);
       initPreferences();
     });
   }
@@ -1136,12 +1131,6 @@ class _ConsumerCartState extends State<ConsumerCart> {
                     ),
                     onPressed: () {
                       Navigator.of(context).pop();
-                      Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(
-                          builder: (BuildContext context) =>
-                              BusinessAddressScreen(),
-                        ),
-                      );
                     },
                   ),
                 ],
@@ -1218,6 +1207,7 @@ class _ConsumerCartState extends State<ConsumerCart> {
   @override
   Widget build(BuildContext context) {
     FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);
+    YYDialog.init(context);
 
     return Scaffold(
       backgroundColor: Color(0xFFF5F5F5),

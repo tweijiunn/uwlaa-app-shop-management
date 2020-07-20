@@ -6,14 +6,16 @@ import 'package:flutter/services.dart';
 import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_screenutil/screenutil.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stripe_payment/stripe_payment.dart';
 import 'package:uwlaa/model/wholesale_cart.dart';
 import 'package:http/http.dart' as http;
 import 'package:uwlaa/screen/payment_status.dart';
+import 'package:uwlaa/screen/user_profile/business_address.dart';
 
 class BusinessCheckOut extends StatefulWidget {
   final List<WholesaleShopCart> wholesaleShopList;
-  final String fullAddress, fullName, phoneNumber, state, postalCode;
+  final String fullAddress, fullName, phoneNumber, state, postalCode, area;
 
   BusinessCheckOut({
     Key key,
@@ -23,6 +25,7 @@ class BusinessCheckOut extends StatefulWidget {
     @required this.phoneNumber,
     @required this.state,
     @required this.postalCode,
+    @required this.area,
   }) : super(key: key);
 
   @override
@@ -62,6 +65,12 @@ class _BusinessCheckOutState extends State<BusinessCheckOut> {
   double _merchandiseSubTotal = 0;
   double _shippingSubTotal = 0;
   double _totalPayment = 0;
+  String shopId = "";
+
+  initPreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    shopId = prefs.getString('shop_id');
+  }
 
   Future<void> _createOrder(String paymentId, YYDialog dialog) {
     var shopData = [];
@@ -114,14 +123,13 @@ class _BusinessCheckOutState extends State<BusinessCheckOut> {
       });
     }
     dialog.show();
-    // TODO: Put actual shop id
     var url =
         "https://us-central1-uwlaamart.cloudfunctions.net/httpFunction/api/v1/createOrder";
     Map data = {
       "transaction_details": shopData,
       "shipping_details": shippingDetails,
       "payment_id": paymentId,
-      "user_shop_id": "Utt59m46wLMb2lyyWhDG",
+      "user_shop_id": shopId,
     };
 
     var body = json.encode(data);
@@ -886,16 +894,66 @@ class _BusinessCheckOutState extends State<BusinessCheckOut> {
 
   bool _isCalculatingShippingFee = false;
 
+  String _fullAddress = "";
+  String _area = "";
+  String _postalCode = "";
+  String _state = "";
+  String _fullName = "";
+  String _phoneNumber = "";
+
+  void _updateAddressInfo(String addressInfo) {
+    var resp = json.decode(addressInfo);
+    setState(() {
+      _newAddressSelected = resp["new_address_selected"];
+      if (_newAddressSelected) {
+        _fullAddress = resp["detail_address"];
+        _area = resp["area"];
+        _postalCode = resp["postal_code"];
+        _state = resp["state"];
+        _fullName = resp["full_name"];
+        _phoneNumber = resp["phone_number"];
+      }
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-    YYDialog.init(context);
+    initPreferences();
     _arrangeCheckoutList();
     _calculateShipping();
   }
 
+  bool _newAddressSelected = false;
+
   @override
   Widget build(BuildContext context) {
+    YYDialog.init(context);
+
+    String _deliveryAddress = "";
+    String _contactDetails = "";
+    if (_newAddressSelected) {
+      print("New address selected");
+      _deliveryAddress = _fullAddress.replaceAll("\\n", "\n") +
+          "\n" +
+          _area +
+          ",\n" +
+          _postalCode +
+          ", " +
+          _state;
+      _contactDetails = _fullName + " | " + _phoneNumber;
+    } else {
+      print("Old address selected");
+      _deliveryAddress = widget.fullAddress.replaceAll("\\n", "\n") +
+          "\n" +
+          widget.area +
+          ",\n" +
+          widget.postalCode +
+          ", " +
+          widget.state;
+      _contactDetails = widget.fullName + " | " + widget.phoneNumber;
+    }
+
     FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);
     return Scaffold(
       appBar: PreferredSize(
@@ -961,7 +1019,7 @@ class _BusinessCheckOutState extends State<BusinessCheckOut> {
                             child: Align(
                               alignment: Alignment.centerLeft,
                               child: Text(
-                                widget.fullName + " | " + widget.phoneNumber,
+                                _contactDetails,
                                 style: TextStyle(
                                   fontSize: ScreenUtil().setSp(40.0),
                                   fontWeight: FontWeight.w500,
@@ -974,7 +1032,7 @@ class _BusinessCheckOutState extends State<BusinessCheckOut> {
                             child: Align(
                               alignment: Alignment.centerLeft,
                               child: Text(
-                                widget.fullAddress.replaceAll("\\n", " "),
+                                _deliveryAddress,
                                 style: TextStyle(
                                   fontSize: ScreenUtil().setSp(40.0),
                                   fontWeight: FontWeight.w500,
@@ -991,8 +1049,18 @@ class _BusinessCheckOutState extends State<BusinessCheckOut> {
                         child: IconButton(
                           icon: Icon(Icons.keyboard_arrow_right),
                           color: Colors.grey,
-                          onPressed: () {
+                          onPressed: () async {
                             print("clicked");
+                            final addressInfo =
+                                await Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (BuildContext context) =>
+                                    BusinessAddressScreen(
+                                  type: "select",
+                                ),
+                              ),
+                            );
+                            _updateAddressInfo(addressInfo);
                           },
                         ),
                       ),

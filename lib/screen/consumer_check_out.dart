@@ -902,7 +902,6 @@ class _ConsumerCheckOutState extends State<ConsumerCheckOut> {
   @override
   void initState() {
     super.initState();
-    YYDialog.init(context);
     _arrangeCheckoutList();
     initPreferences();
     _calculateShipping();
@@ -911,6 +910,7 @@ class _ConsumerCheckOutState extends State<ConsumerCheckOut> {
   @override
   Widget build(BuildContext context) {
     FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);
+    YYDialog.init(context);
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(50.0),

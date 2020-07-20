@@ -6,6 +6,7 @@ import 'package:flutter_custom_dialog/flutter_custom_dialog.dart';
 import 'package:flutter_screenutil/screenutil.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uwlaa/model/business_product.dart';
 import 'package:uwlaa/model/http_request_response.dart';
 import 'package:uwlaa/model/wholesale_cart.dart';
@@ -29,6 +30,7 @@ class _BusinessCartState extends State<BusinessCart> {
   List<WholesaleShopCart> _wholesaleShopCart = List<WholesaleShopCart>();
 
   bool _isEditing = false;
+  String shopId = "";
 
   YYDialog yyProgressDialogNoBody() {
     return YYDialog().build()
@@ -48,13 +50,20 @@ class _BusinessCartState extends State<BusinessCart> {
       );
   }
 
+  initPreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    shopId = prefs.getString('shop_id');
+    var dialog = yyProgressDialogNoBody();
+    _initCartList(dialog);
+  }
+
   Future<void> _initCartList(YYDialog dialog) async {
     _wholesaleShopCart = [];
     _price = 0;
     var url =
         "https://us-central1-uwlaamart.cloudfunctions.net/httpFunction/api/v1/mobileGetBusinessCart";
     // TODO: The shop_id should get from shared preferences
-    Map data = {'shop_id': 'Utt59m46wLMb2lyyWhDG'};
+    Map data = {'shop_id': shopId};
     var body = json.encode(data);
     dialog.show();
     http
@@ -384,7 +393,7 @@ class _BusinessCartState extends State<BusinessCart> {
     // TODO: Replace the user shop id
     Map data = {
       "selected_variation_list": removeCartItemList,
-      "user_shop_id": "Utt59m46wLMb2lyyWhDG"
+      "user_shop_id": shopId
     };
     var body = json.encode(data);
     dialog.show();
@@ -424,7 +433,7 @@ class _BusinessCartState extends State<BusinessCart> {
     var url =
         "https://us-central1-uwlaamart.cloudfunctions.net/httpFunction/api/v1/mobileSingleEditForBusinessCart";
     Map data = {
-      'user_shop_id': 'Utt59m46wLMb2lyyWhDG',
+      'user_shop_id': shopId,
       'selected_product_id': productId,
       'selected_variation_id': variationId,
       'type': type,
@@ -697,7 +706,7 @@ class _BusinessCartState extends State<BusinessCart> {
                                                             _updateCart(
                                                               j.variationId,
                                                               i.productId,
-                                                              "Utt59m46wLMb2lyyWhDG",
+                                                              shopId,
                                                               -i.productDetails
                                                                   .minimumLot,
                                                               j.addedToCartQuantity -
@@ -717,7 +726,7 @@ class _BusinessCartState extends State<BusinessCart> {
                                                 _updateCart(
                                                   j.variationId,
                                                   i.productId,
-                                                  "Utt59m46wLMb2lyyWhDG",
+                                                  shopId,
                                                   -i.productDetails.minimumLot,
                                                   j.addedToCartQuantity -
                                                       i.productDetails
@@ -792,7 +801,7 @@ class _BusinessCartState extends State<BusinessCart> {
                                                     _updateCart(
                                                       j.variationId,
                                                       i.productId,
-                                                      "Utt59m46wLMb2lyyWhDG",
+                                                      shopId,
                                                       i.productDetails
                                                           .minimumLot,
                                                       j.addedToCartQuantity +
@@ -1049,9 +1058,7 @@ class _BusinessCartState extends State<BusinessCart> {
   void initState() {
     super.initState();
     Future.delayed(Duration.zero).then((value) {
-      YYDialog.init(context);
-      var dialog = yyProgressDialogNoBody();
-      _initCartList(dialog);
+      initPreferences();
     });
   }
 
@@ -1064,7 +1071,7 @@ class _BusinessCartState extends State<BusinessCart> {
   Future<void> _checkDefaultAddress() {
     var url =
         "https://us-central1-uwlaamart.cloudfunctions.net/httpFunction/api/v1/checkBusinessGotDefaultAddress";
-    Map data = {'user_shop_id': 'Utt59m46wLMb2lyyWhDG'};
+    Map data = {'user_shop_id': shopId};
     var body = json.encode(data);
     _isChecking = true;
     setState(() {});
@@ -1088,6 +1095,7 @@ class _BusinessCartState extends State<BusinessCart> {
                 fullName: resp["full_name"],
                 state: resp["state"],
                 postalCode: resp["postal_code"],
+                area: resp["area"],
               ),
             ),
           );
@@ -1137,10 +1145,12 @@ class _BusinessCartState extends State<BusinessCart> {
                     ),
                     onPressed: () {
                       Navigator.of(context).pop();
-                      Navigator.of(context).pushReplacement(
+                      Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (BuildContext context) =>
-                              BusinessAddressScreen(),
+                              BusinessAddressScreen(
+                            type: "create",
+                          ),
                         ),
                       );
                     },
@@ -1203,6 +1213,7 @@ class _BusinessCartState extends State<BusinessCart> {
   @override
   Widget build(BuildContext context) {
     FlutterStatusbarcolor.setStatusBarColor(Colors.transparent);
+    YYDialog.init(context);
 
     return Scaffold(
       backgroundColor: Color(0xFFF5F5F5),
